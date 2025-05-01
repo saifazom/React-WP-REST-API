@@ -1,12 +1,17 @@
 FROM node:20-slim AS development-dependencies-env
-COPY . /app
 WORKDIR /app
-# Remove existing node_modules and package-lock.json if they exist
-RUN rm -rf node_modules package-lock.json
+# Copy package.json first to leverage Docker layer caching
+COPY package.json package-lock.json* ./
+# Only remove node_modules and package-lock.json if package.json has changed
+RUN if [ -f package-lock.json ]; then \
+        rm -rf node_modules package-lock.json; \
+    fi
 # Install dependencies with platform-specific binaries and ensure sourcemaps are properly generated
 RUN npm install
 # Set NODE_ENV to development to ensure proper sourcemap generation
 ENV NODE_ENV=development
+# Copy the rest of the application
+COPY . .
 
 FROM node:20-slim AS production-dependencies-env
 COPY ./package.json /app/
