@@ -3,19 +3,23 @@ COPY . /app
 WORKDIR /app
 # Remove existing node_modules and package-lock.json if they exist
 RUN rm -rf node_modules package-lock.json
-# Install dependencies with platform-specific binaries
+# Install dependencies with platform-specific binaries and ensure sourcemaps are properly generated
 RUN npm install
+# Set NODE_ENV to development to ensure proper sourcemap generation
+ENV NODE_ENV=development
 
 FROM node:20-slim AS production-dependencies-env
 COPY ./package.json /app/
 WORKDIR /app
-# Clean install production dependencies
 RUN npm install --omit=dev
 
 FROM node:20-slim AS build-env
 COPY . /app/
 COPY --from=development-dependencies-env /app/node_modules /app/node_modules
 WORKDIR /app
+# Ensure sourcemaps are generated during build
+ENV GENERATE_SOURCEMAP=true
+ENV NODE_ENV=development
 RUN npm run build
 
 FROM node:20-slim
