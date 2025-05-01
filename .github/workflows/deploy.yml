@@ -30,6 +30,11 @@ jobs:
           -H "Content-Type: application/json" \
           -d "{\"branch\":\"${GITHUB_REF#refs/heads/}\",\"sha\":\"$GITHUB_SHA\"}"
 
+      - name: Debug GitHub Context
+        run: |
+          echo "GITHUB_REF=$GITHUB_REF"
+          echo "Branch: ${GITHUB_REF#refs/heads/}"
+
       - name: Finish GitHub Deployment (Success)
         if: success()
         uses: bobheadxi/deployments@v1
