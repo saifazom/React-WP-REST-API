@@ -25,9 +25,9 @@ jobs:
 
       - name: Trigger Dokploy Webhook
         run: |
-          curl -X POST https://app.cofixer.dev/api/deploy/FfwTMAEgXYWiv6C8ou4vu \
+          curl -X POST ${{ secrets.DOKPLOY_WEBHOOK_URL }} \
           -H "Content-Type: application/json" \
-          -d '{"branch":"production","sha":"test-sha"}'
+          -d "{\"branch\":\"main\",\"sha\":\"$GITHUB_SHA\"}"
 
       - name: Finish GitHub Deployment (Success)
         if: success()
