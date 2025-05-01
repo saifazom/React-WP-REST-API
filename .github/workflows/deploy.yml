@@ -29,6 +29,10 @@ jobs:
           -H "Content-Type: application/json" \
           -d "{\"branch\":\"main\",\"sha\":\"$GITHUB_SHA\"}"
 
+      - name: Show webhook payload
+        run: |
+          echo "Payload: {\"branch\":\"${GITHUB_REF#refs/heads/}\",\"sha\":\"$GITHUB_SHA\"}"
+
       - name: Finish GitHub Deployment (Success)
         if: success()
         uses: bobheadxi/deployments@v1
