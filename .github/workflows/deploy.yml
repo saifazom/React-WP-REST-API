@@ -25,15 +25,9 @@ jobs:
 
       - name: Trigger Dokploy Webhook
         run: |
-          echo "Deploying branch: ${GITHUB_REF#refs/heads/}"
           curl -X POST ${{ secrets.DOKPLOY_WEBHOOK_URL }} \
           -H "Content-Type: application/json" \
-          -d "{\"branch\":\"${GITHUB_REF#refs/heads/}\",\"sha\":\"$GITHUB_SHA\"}"
-
-      - name: Debug GitHub Context
-        run: |
-          echo "GITHUB_REF=$GITHUB_REF"
-          echo "Branch: ${GITHUB_REF#refs/heads/}"
+          -d "{\"branch\":\"production\",\"sha\":\"$GITHUB_SHA\"}"
 
       - name: Finish GitHub Deployment (Success)
         if: success()
