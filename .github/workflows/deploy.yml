@@ -14,6 +14,14 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
+      - name: Create GitHub deployment
+        id: deployment
+        uses: chrnorm/deployment-action@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          environment: production
+          initial-status: in_progress
+
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
@@ -31,8 +39,11 @@ jobs:
             -d '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
 
       - name: Update deployment status
+        if: always()
         uses: chrnorm/deployment-status@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          state: "success"
+          state: ${{ job.status == 'success' && 'success' || 'failure' }}
           deployment-id: ${{ steps.deployment.outputs.deployment_id }}
+          environment-url: ${{ secrets.DEPLOYMENT_URL }}
+          auto-inactive: true
