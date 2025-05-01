@@ -1,49 +1,42 @@
-name: Deploy
+name: Deploy to Dokploy
+
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Create GitHub deployment
+      - name: Start GitHub Deployment
         id: deployment
-        uses: chrnorm/deployment-action@v2
+        uses: bobheadxi/deployments@v1
         with:
+          step: start
           token: ${{ secrets.GITHUB_TOKEN }}
-          environment: production
-          initial-status: in_progress
+          env: production
+          ref: ${{ github.ref }}
 
-      - name: Build and push
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          push: false
-          load: true
-          tags: react-kit-19:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: Deploy to Dokploy
+      - name: Trigger Dokploy Webhook
         run: |
-          curl -X POST ${{ secrets.DOKPLOY_WEBHOOK_URL }} \
-            -H "Content-Type: application/json" \
-            -d '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
+          curl -X POST ${{ secrets.DOKPLOY_WEBHOOK_URL }}
 
-      - name: Update deployment status
-        if: always()
-        uses: chrnorm/deployment-status@v2
+      - name: Finish GitHub Deployment (Success)
+        if: success()
+        uses: bobheadxi/deployments@v1
         with:
+          step: finish
+          status: success
           token: ${{ secrets.GITHUB_TOKEN }}
-          state: ${{ job.status == 'success' && 'success' || 'failure' }}
-          deployment-id: ${{ steps.deployment.outputs.deployment_id }}
-          environment-url: ${{ secrets.DEPLOYMENT_URL }}
-          auto-inactive: true
+          env: production
+          deployment_id: ${{ steps.deployment.outputs.deployment_id }}
+
+      - name: Finish GitHub Deployment (Failure)
+        if: failure()
+        uses: bobheadxi/deployments@v1
+        with:
+          step: finish
+          status: failure
+          token: ${{ secrets.GITHUB_TOKEN }}
+          env: production
+          deployment_id: ${{ steps.deployment.outputs.deployment_id }}
