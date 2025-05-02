@@ -27,7 +27,7 @@ ENV GENERATE_SOURCEMAP=true
 ENV NODE_ENV=development
 RUN npm run build
 
-FROM node:20-slim
+FROM node:20-slim AS production
 COPY ./package.json /app/
 COPY --from=production-dependencies-env /app/node_modules /app/node_modules
 COPY --from=build-env /app/build /app/build
