@@ -1,6 +1,6 @@
 version: '1'
 app:
-  name: Frontend/coffeeclub-frontend-bqvwxu
+  name: coffeeclub-frontend-bqvwxu
   type: web
   
 build:
