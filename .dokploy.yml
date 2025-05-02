@@ -1,6 +1,6 @@
 version: '1'
 app:
-  name: react-starter-kit
+  name: Frontend/coffeeclub-frontend-bqvwxu
   type: web
   
 build:
