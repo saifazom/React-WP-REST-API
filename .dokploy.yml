@@ -1,6 +1,6 @@
 version: '1'
 app:
-  name: Frontend
+  name: react-starter-kit
   type: web
   
 build:
