@@ -2,7 +2,7 @@ version: '1'
 app:
   name: react-starter-kit
   type: web
-  repository: CoFixer/react-starter-kit  
+  repository: react-starter-kit  
   
 build:
   dockerfile: Dockerfile
