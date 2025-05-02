@@ -35,6 +35,7 @@ jobs:
           step: finish
           status: success
           token: ${{ secrets.GITHUB_TOKEN }}
+          env: production
           deployment_id: ${{ steps.deployment.outputs.deployment_id }}
 
       - name: Finish GitHub Deployment (Failure)
@@ -44,4 +45,5 @@ jobs:
           step: finish
           status: failure
           token: ${{ secrets.GITHUB_TOKEN }}
+          env: production
           deployment_id: ${{ steps.deployment.outputs.deployment_id }}
