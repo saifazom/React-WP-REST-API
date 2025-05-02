@@ -24,14 +24,9 @@ jobs:
 
       - name: Trigger Dokploy Webhook
         run: |
-          $branch = $env:GITHUB_REF -replace 'refs/heads/', ''
-          $body = @{
-            branch = $branch
-            sha = $env:GITHUB_SHA
-          } | ConvertTo-Json
-          
-          Invoke-RestMethod -Uri $env:DOKPLOY_WEBHOOK_URL -Method Post -Body $body -ContentType 'application/json'
-        shell: pwsh
+          curl -X POST ${{ secrets.DOKPLOY_WEBHOOK_URL }} \
+          -H "Content-Type: application/json" \
+          -d '{"branch":"main","sha":"'"$GITHUB_SHA"'"}'
 
       - name: Finish GitHub Deployment (Success)
         if: success()
