@@ -25,19 +25,23 @@ jobs:
       - name: Trigger Dokploy Webhook and Check Status
         id: dokploy
         run: |
-          # Trigger deployment
-          curl -X POST ${{ secrets.DOKPLOY_WEBHOOK_URL }} \
+          # Trigger deployment with auth token
+          curl -X POST ${{ secrets.DOKPLOY_URL }}/deploy \
           -H "Content-Type: application/json" \
-          -d "{\"branch\":\"main\",\"sha\":\"$GITHUB_SHA\"}"
+          -H "Authorization: Bearer ${{ secrets.DOKPLOY_AUTH_TOKEN }}" \
+          -d "{\"application_id\":\"${{ secrets.DOKPLOY_APPLICATION_ID }}\",\"branch\":\"main\",\"sha\":\"$GITHUB_SHA\"}"
           
           # Wait for a moment to let deployment start
           sleep 10
           
-          # Check deployment status
+          # Check deployment status with auth token
           max_attempts=30
           attempt=1
           while [ $attempt -le $max_attempts ]; do
-            response=$(curl -s ${{ secrets.DOKPLOY_WEBHOOK_URL }}/status)
+            response=$(curl -s ${{ secrets.DOKPLOY_URL }}/status \
+            -H "Authorization: Bearer ${{ secrets.DOKPLOY_AUTH_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d "{\"application_id\":\"${{ secrets.DOKPLOY_APPLICATION_ID }}\"}")
             echo "Attempt $attempt: $response"
             
             if [[ $response == *"success"* ]]; then
