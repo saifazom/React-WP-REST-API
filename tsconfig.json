@@ -23,7 +23,5 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
-    "sourceMap": true,
-    "inlineSources": true
   }
 }
