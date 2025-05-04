@@ -36,8 +36,8 @@ jobs:
       - name: Check and Install Dependencies
         run: |
           if git diff --quiet HEAD^ HEAD package.json; then
-            echo "No changes in package.json, using npm ci"
-            npm ci
+            echo "No changes in package.json"
+            npm install
           else
             echo "Changes detected in package.json, performing clean install"
             rm -rf node_modules package-lock.json
