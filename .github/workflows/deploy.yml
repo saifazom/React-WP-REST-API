@@ -24,6 +24,8 @@ jobs:
 
       - name: Checkout code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 2  
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -33,7 +35,14 @@ jobs:
 
       - name: Check and Install Dependencies
         run: |
-          npm ci
+          if git diff --quiet HEAD^ HEAD package.json; then
+            echo "No changes in package.json, using npm ci"
+            npm ci
+          else
+            echo "Changes detected in package.json, performing clean install"
+            rm -rf node_modules package-lock.json
+            npm install
+          fi
 
       - name: Build Project
         id: build
