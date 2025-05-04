@@ -33,6 +33,7 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
+          fetch-depth: 2
 
       - name: Check and Install Dependencies
         run: |
