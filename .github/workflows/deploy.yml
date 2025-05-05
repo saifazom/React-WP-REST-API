@@ -35,12 +35,9 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          if [ -f package-lock.json ]; then
-            npm ci --prefer-offline --no-audit --no-optional
-          else
-            npm install --no-optional --no-audit
-          fi
-          npm install @rollup/rollup-linux-x64-gnu --save-optional --no-audit
+          rm -rf node_modules package-lock.json
+          npm ci
+          npm install @rollup/rollup-linux-x64-gnu --save-optional
 
       - name: Build Project
         id: build
