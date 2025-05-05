@@ -60,12 +60,37 @@ jobs:
           CI: true
           NODE_ENV: production
 
-      - name: Update Deployment Status
-        if: always()
-        uses: bobheadxi/deployments@v1
-        with:
-          step: finish
-          token: ${{ secrets.GITHUB_TOKEN }}
-          status: ${{ job.status }}
-          env: production
-          deployment_id: ${{ steps.deployment.outputs.deployment_id }}
+      - name: Check Dokploy Status
+        run: |
+          max_attempts=30
+          attempt=1
+          while [ $attempt -le $max_attempts ]; do
+            response=$(curl -X GET "https://app.cofixer.dev/api/deployment.all?applicationId=${{ secrets.DOKPLOY_APP_ID }}" \
+            -H "Content-Type: application/json")
+            
+            # Get the latest deployment status
+            latest_status=$(echo $response | jq -r '.[0].status')
+            latest_title=$(echo $response | jq -r '.[0].title')
+            latest_time=$(echo $response | jq -r '.[0].createdAt')
+            
+            echo "Latest deployment:"
+            echo "Title: $latest_title"
+            echo "Status: $latest_status"
+            echo "Time: $latest_time"
+            
+            if [[ "$latest_status" == "done" ]]; then
+              echo "✅ Deployment successful!"
+              exit 0
+            elif [[ "$latest_status" == "failed" ]]; then
+              error_msg=$(echo $response | jq -r '.[0].errorMessage')
+              echo "❌ Deployment failed: $error_msg"
+              exit 1
+            fi
+            
+            echo "⏳ Waiting for deployment to complete... (Attempt $attempt of $max_attempts)"
+            sleep 10
+            attempt=$((attempt + 1))
+          done
+          
+          echo "⚠️ Deployment status check timed out"
+          exit 1
