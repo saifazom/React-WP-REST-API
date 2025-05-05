@@ -68,23 +68,37 @@ jobs:
             response=$(curl -X GET "https://app.cofixer.dev/api/deployment.all?applicationId=${{ secrets.DOKPLOY_APP_ID }}" \
             -H "Content-Type: application/json")
             
-            # Get the latest deployment status
-            latest_status=$(echo $response | jq -r '.[0].status')
-            latest_title=$(echo $response | jq -r '.[0].title')
-            latest_time=$(echo $response | jq -r '.[0].createdAt')
+            # Check if response is empty or invalid
+            if [ -z "$response" ]; then
+              echo "Empty response received"
+              sleep 10
+              attempt=$((attempt + 1))
+              continue
+            fi
             
-            echo "Latest deployment:"
-            echo "Title: $latest_title"
-            echo "Status: $latest_status"
-            echo "Time: $latest_time"
-            
-            if [[ "$latest_status" == "done" ]]; then
-              echo "✅ Deployment successful!"
-              exit 0
-            elif [[ "$latest_status" == "failed" ]]; then
-              error_msg=$(echo $response | jq -r '.[0].errorMessage')
-              echo "❌ Deployment failed: $error_msg"
-              exit 1
+            # Parse JSON response safely
+            if echo "$response" | jq -e . >/dev/null 2>&1; then
+              # Get the latest deployment status
+              latest_status=$(echo "$response" | jq -r 'if length > 0 then .[0].status else "unknown" end')
+              latest_title=$(echo "$response" | jq -r 'if length > 0 then .[0].title else "unknown" end')
+              latest_time=$(echo "$response" | jq -r 'if length > 0 then .[0].createdAt else "unknown" end')
+              
+              echo "Latest deployment:"
+              echo "Title: $latest_title"
+              echo "Status: $latest_status"
+              echo "Time: $latest_time"
+              
+              if [[ "$latest_status" == "done" ]]; then
+                echo "✅ Deployment successful!"
+                exit 0
+              elif [[ "$latest_status" == "failed" ]]; then
+                error_msg=$(echo "$response" | jq -r 'if length > 0 then .[0].errorMessage else "unknown error" end')
+                echo "❌ Deployment failed: $error_msg"
+                exit 1
+              fi
+            else
+              echo "Invalid JSON response received"
+              echo "Response: $response"
             fi
             
             echo "⏳ Waiting for deployment to complete... (Attempt $attempt of $max_attempts)"
