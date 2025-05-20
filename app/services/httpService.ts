@@ -1,21 +1,21 @@
-import axios from 'axios';
+import axios from "axios";
 import type {
   AxiosError,
   AxiosInstance,
   AxiosRequestConfig,
   InternalAxiosRequestConfig,
-} from 'axios';
-import type { ApiErrorResponse } from '~/types/httpService';
-import { createErrorResponse, handleAxiosError } from '~/utils/errorHandler';
+} from "axios";
+import type { AxiosError as ApiErrorResponse } from "axios";
+import { createErrorResponse, handleAxiosError } from "~/utils/errorHandler";
 
 class HttpService {
   private api: AxiosInstance;
 
   constructor() {
     this.api = axios.create({
-      baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
+      baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000/api",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       timeout: 10000, // 10 seconds
     });
@@ -23,7 +23,7 @@ class HttpService {
     // Request interceptor
     this.api.interceptors.request.use(
       (config: InternalAxiosRequestConfig) => {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem("token");
         if (token && config.headers) {
           config.headers.Authorization = `Bearer ${token}`;
         }
@@ -54,7 +54,11 @@ class HttpService {
     }
   }
 
-  public async post<T>(url: string, data?: any, config?: AxiosRequestConfig<any>) {
+  public async post<T>(
+    url: string,
+    data?: any,
+    config?: AxiosRequestConfig<any>
+  ) {
     try {
       const response = await this.api.post<T>(url, data, config);
       return response.data;
@@ -63,7 +67,11 @@ class HttpService {
     }
   }
 
-  public async put<T>(url: string, data?: any, config?: AxiosRequestConfig<any>) {
+  public async put<T>(
+    url: string,
+    data?: any,
+    config?: AxiosRequestConfig<any>
+  ) {
     try {
       const response = await this.api.put<T>(url, data, config);
       return response.data;

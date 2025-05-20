@@ -1,6 +1,7 @@
-import { createSlice } from '@reduxjs/toolkit';
-import { createUser, fetchUsers } from '~/services/httpServices/userService';
-import type { UserState } from '~/types/user';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createUser, fetchUsers } from "~/services/httpServices/userService";
+import type { UserState } from "~/types/user";
+import axios from "axios";
 
 const initialState: UserState = {
   users: [],
@@ -9,7 +10,7 @@ const initialState: UserState = {
 };
 
 const userSlice = createSlice({
-  name: 'user',
+  name: "user",
   initialState,
   reducers: {},
   extraReducers: (builder) => {

@@ -6,7 +6,7 @@ import {
   Scripts,
   ScrollRestoration,
 } from "react-router";
-import { Providers } from './hooks/providers/providers';
+import { Providers } from "./hooks/providers/providers";
 import type { Route } from "./+types/root";
 import "./styles/app.css";
 
@@ -33,9 +33,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        <Providers>
-          {children}
-        </Providers>
+        <Providers>{children}</Providers>
         <ScrollRestoration />
         <Scripts />
       </body>
