@@ -7,7 +7,7 @@ const Greeting = ({ name }: { name: string }) => {
     <>
       <h1>
         Hello, {name}! <br />
-        From - {world}
+        From - {world}, Bangladesh.
       </h1>
 
       <div className="mt-10">
